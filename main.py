@@ -1,6 +1,6 @@
-import requests
-import mysql.connector
 
+import mysql.connector
+import requests
 
 api_key = "b8837b5152dcef4e61819348f3b3a615"
 base_url = "http://api.openweathermap.org/data/2.5/weather?"
@@ -18,8 +18,6 @@ if response.status_code == 200:
    
    print(f"{city_name:-^35}")
    print(f"City ID: {data['id']}")   
-   sql = "INSERT INTO weather (id)" 
-   Val =data['id']
    print(f"Temperature: {temperature}") 
    print(f"Humidity: {humidity}")
    print(f"Pressure: {pressure}")
@@ -27,15 +25,27 @@ if response.status_code == 200:
    print(f"Wind Speed: {wind_report['speed']}")
    print(f"Time Zone: {data['timezone']}")
 else:
-   # showing the error message
    print("Error in the HTTP request")
 
-mydb = mysql.connector.connect(
+cnx = mysql.connector.connect(
   host="db",
-  user="app",
+  user="app", 
   password="password",
   database="app"
 )
-mycursor = mydb.cursor()
-sql = "INSERT INTO weather (id, description, temperture, wind_speed, date) VALUES (%s, %s, %s, %s, %s)"
-val = [ "(data['id'] , weather_report, temperature, wind_report, data['timezone'])" ]
+mycursor = cnx.cursor()
+add_weather = ("INSERT INTO weather "
+                "( description, temperature, wind_speed, date)" 
+                "VALUES ( %(description)s, %(temperature)s, %(wind_speed)s, CURRENT_DATE() ); "
+                )
+
+data_weather = {
+  'description' : ({weather_report[0]['description']}),
+  'temperature' : ({temperature}) ,
+  'wind_speed' : ({weather_report['wind']['speed']})
+}
+mycursor.execute(add_weather, data_weather)
+cnx.commit()
+
+mycursor.close()
+cnx.close()
