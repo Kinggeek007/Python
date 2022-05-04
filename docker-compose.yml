@@ -1,0 +1,28 @@
+version: '2'
+services:
+  db:
+    build: ./mysql
+    volumes:
+      - "./.mysql-data/db:/var/lib/mysql"
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: password
+
+  app:
+    build: .
+    volumes:
+      - "./:/usr/local/app"
+    working_dir: /usr/local/app
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpw
+      MYSQL_DATABASE: app
+      MYSQL_USER: app
+      MYSQL_PASSWORD: password
+    depends_on:
+      - db
