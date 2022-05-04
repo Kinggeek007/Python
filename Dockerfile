@@ -1,10 +1,3 @@
-FROM python:3
+FROM mysql:latest
 
-WORKDIR /usr/src/app
-
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
-
-CMD [ "sleep", "infinity" ]
+ADD schema.sql /docker-entrypoint-initdb.d
